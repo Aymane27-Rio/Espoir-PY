@@ -13,11 +13,12 @@ pygame.display.set_caption("Guardian Path Simulation")
 
 # Colors
 WHITE = (255, 255, 255)
-BLACK = (0, 0, 0)
-RED = (255, 0, 0)
-GREEN = (0, 255, 0)
-BLUE = (0, 0, 255)
-GRAY = (100, 100, 100)
+BLACK = (30, 30, 30)
+RED = (255, 69, 0)
+GREEN = (0, 200, 0)
+BLUE = (30, 144, 255)
+GRAY = (120, 120, 120)
+YELLOW = (255, 223, 0)
 
 # City grid settings
 GRID_SIZE = 50
@@ -42,15 +43,17 @@ class Vehicle:
             if not self.path:
                 self.destination_reached = True
         elif not self.stopped:
-            self.x += self.direction[0]
-            self.y += self.direction[1]
-            if self.x < 0 or self.x >= WIDTH or self.y < 0 or self.y >= HEIGHT:
-                self.x -= self.direction[0]
-                self.y -= self.direction[1]
-                self.direction = random.choice([(GRID_SIZE, 0), (-GRID_SIZE, 0), (0, GRID_SIZE), (0, -GRID_SIZE)])
+            possible_moves = [(self.x + dx, self.y + dy) for dx, dy in [(-GRID_SIZE, 0), (GRID_SIZE, 0), (0, -GRID_SIZE), (0, GRID_SIZE)]]
+            random.shuffle(possible_moves)
+            for new_x, new_y in possible_moves:
+                if 0 <= new_x < WIDTH and 0 <= new_y < HEIGHT:
+                    self.x, self.y = new_x, new_y
+                    break
 
     def draw(self, screen):
-        pygame.draw.rect(screen, self.color, (self.x, self.y, GRID_SIZE, GRID_SIZE))
+        pygame.draw.circle(screen, self.color, (self.x + GRID_SIZE // 2, self.y + GRID_SIZE // 2), GRID_SIZE // 3)
+        if self.special:
+            pygame.draw.circle(screen, YELLOW, (self.x + GRID_SIZE // 2, self.y + GRID_SIZE // 2), GRID_SIZE // 4, 2)
 
 # Node class (for pathfinding & signals)
 class Node:
@@ -61,13 +64,13 @@ class Node:
 
     def draw(self, screen):
         color = GREEN if self.signal_active else GRAY
-        pygame.draw.circle(screen, color, (self.x + GRID_SIZE // 2, self.y + GRID_SIZE // 2), 10)
+        pygame.draw.circle(screen, color, (self.x + GRID_SIZE // 2, self.y + GRID_SIZE // 2), 8)
 
 # Generate road nodes
-nodes = {(x * GRID_SIZE, y * GRID_SIZE): Node(x * GRID_SIZE, y * GRID_SIZE) for x in range(COLS) for y in range(ROWS) if x % 2 == 0}
+nodes = {(x * GRID_SIZE, y * GRID_SIZE): Node(x * GRID_SIZE, y * GRID_SIZE) for x in range(COLS) for y in range(ROWS)}
 
 # Vehicles (regular and special)
-vehicles = [Vehicle(random.randint(1, COLS - 2) * GRID_SIZE, random.randint(1, ROWS - 2) * GRID_SIZE, BLUE) for _ in range(5)]
+vehicles = [Vehicle(random.randint(0, COLS - 1) * GRID_SIZE, random.randint(0, ROWS - 1) * GRID_SIZE, BLUE) for _ in range(5)]
 special_vehicle = Vehicle(100, 100, RED, special=True)
 
 # Dijkstra's Algorithm for shortest path
