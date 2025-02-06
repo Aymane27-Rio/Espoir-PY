@@ -3,15 +3,15 @@ import sys
 import heapq
 import random
 
-# Initialize pygame
+
 pygame.init()
 
-# Screen settings
+
 WIDTH, HEIGHT = 800, 600
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 pygame.display.set_caption("Guardian Path Simulation")
 
-# Colors
+
 WHITE = (255, 255, 255)
 BLACK = (30, 30, 30)
 RED = (255, 69, 0)
@@ -20,11 +20,11 @@ BLUE = (30, 144, 255)
 GRAY = (120, 120, 120)
 YELLOW = (255, 223, 0)
 
-# City grid settings
+
 GRID_SIZE = 50
 ROWS, COLS = HEIGHT // GRID_SIZE, WIDTH // GRID_SIZE
 
-# Vehicle class
+
 class Vehicle:
     def __init__(self, x, y, color, special=False):
         self.x = x
@@ -55,7 +55,7 @@ class Vehicle:
         if self.special:
             pygame.draw.circle(screen, YELLOW, (self.x + GRID_SIZE // 2, self.y + GRID_SIZE // 2), GRID_SIZE // 4, 2)
 
-# Node class (for pathfinding & signals)
+
 class Node:
     def __init__(self, x, y):
         self.x = x
@@ -66,14 +66,14 @@ class Node:
         color = GREEN if self.signal_active else GRAY
         pygame.draw.circle(screen, color, (self.x + GRID_SIZE // 2, self.y + GRID_SIZE // 2), 8)
 
-# Generate road nodes
+
 nodes = {(x * GRID_SIZE, y * GRID_SIZE): Node(x * GRID_SIZE, y * GRID_SIZE) for x in range(COLS) for y in range(ROWS)}
 
-# Vehicles (regular and special)
+
 vehicles = [Vehicle(random.randint(0, COLS - 1) * GRID_SIZE, random.randint(0, ROWS - 1) * GRID_SIZE, BLUE) for _ in range(5)]
 special_vehicle = Vehicle(100, 100, RED, special=True)
 
-# Dijkstra's Algorithm for shortest path
+
 def dijkstra(start, end):
     queue = [(0, start)]
     distances = {start: 0}
@@ -99,7 +99,7 @@ def dijkstra(start, end):
             heapq.heappush(queue, (distances[neighbor], neighbor))
     return []
 
-# Game loop
+
 running = True
 selected_destination = None
 start_movement = False
@@ -144,3 +144,4 @@ while running:
 
 pygame.quit()
 sys.exit()
+
